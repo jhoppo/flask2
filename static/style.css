@@ -1,0 +1,16 @@
+.table{
+    border-spacing: 0;
+    margin: 1rem;
+    background-color: #f5f5f5;
+}
+.tableRow:nth-child(even){
+    background-color: #e5e5e5;
+}
+
+.tableHeader{
+    text-align: left;
+}
+
+.tableCell{
+    padding: 8px;
+}

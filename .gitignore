@@ -1,0 +1,9 @@
+# created by virtualenv automatically
+__*
+.idea/
+Lib/
+Scripts/
+pyvenv.cfg
+999-*
+Cred*
+test*
