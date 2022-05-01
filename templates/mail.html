@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mail Page</title>
+</head>
+<body>
+<form method="post" action="/mail/send">
+  <p><h1>Do NOT change the fucking values if you don't know what the fuck it is!</h1></p>
+  <p>server:<input type="text" value="smtp.office365.com" name="smtp" />  Port:<input type="text" value="587" name="port"/></p>
+  <hr>
+  <p><h2>Sender</h2><input type="text" name="id" /></p>
+  <p><h2>password</h2><input type="password" name="pw" /></p>
+  <p><h2>Recerivers (seprated by , ):<input type="text" name="receivers" /></h2></p>
+  <p><h2>Cc (optional):</h2><input type="text" name="ccs" /></p>
+  <p><h2>Subject</h2><input type="text" name="subject" /></p>
+  <p><h2>Body</h2><input type="text" name="body" height="500" width="800" /> </p>
+  <input type="submit" name="submit" value="Send Mail !" />
+</form>
+<p>Sender status: {{ send_result }}</p>
+</body>
+</html>

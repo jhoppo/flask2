@@ -2,6 +2,8 @@ from flask import Flask, redirect, request, url_for, render_template
 import pymysql
 from db import db
 import Creds
+from jhmail import JiehongEmail as je
+import datetime
 
 app = Flask(__name__)
 @app.route('/req')
@@ -62,5 +64,39 @@ def InsertionSubmit():
             con.insert(f"delete from testdb {where}")
             con.discon()
     return redirect(url_for('Insertion'))
+
+@app.route('/mail')
+def CreateMail():
+    return render_template('/mail.html')
+@app.route('/mail/send', methods=['POST'])
+def SendMail():
+    if request.form['id'] == '':
+        sendCode = "Send Failed. Tell me Who the fuck you are!"
+        return render_template('/mail.html', send_result=sendCode)
+    if '@' not in request.form['id']:
+        sendCode = "Send Failed. Are you fucking idiot? Give me the right mail address !"
+        return render_template('/mail.html', send_result=sendCode)
+    if request.form['pw'] == '':
+        sendCode = "Send Failed. Tell me What the fuck is your password!"
+        return render_template('/mail.html', send_result=sendCode)
+    if request.form['receivers'] == '':
+        sendCode = "Send Failed. Who the fuck is your receiver?! Stop being dump!"
+        return render_template('/mail.html', send_result=sendCode)
+    senderInfo = Creds.mailInfo
+    sm = je(sender=request.form['id'],
+            sender_password=request.form['pw'],
+            smtp_host=request.form['smtp'],
+            smtp_host_port=request.form['port'])
+    sm.MailSubject(request.form['subject'])
+    receivers = request.form['receivers'].replace(" ","").split(",")
+    sm.SendTo(receivers)
+    sm.MailContent(request.form['body'])
+    if len(request.form['ccs']) > 0:
+        ccs = request.form['ccs'].replace(" ","").split(",")
+        sm.CcTo(ccs)
+    sendCode = sm.SendMail()
+    sm.LogoutsmTP()
+    return render_template( 'mail.html', send_result = sendCode)
+
 if __name__ == '__main__':
     app.run(debug=True)
