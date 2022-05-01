@@ -7,3 +7,4 @@ pyvenv.cfg
 999-*
 Cred*
 test*
+startup.sh
