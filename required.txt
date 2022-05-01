@@ -1,4 +1,2 @@
 flask
 pymysql
-smtplib
-email
