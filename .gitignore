@@ -8,3 +8,4 @@ pyvenv.cfg
 Cred*
 test*
 startup.sh
+update.sh
