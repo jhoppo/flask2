@@ -7,6 +7,31 @@ import datetime
 import json
 
 app = Flask(__name__)
+
+@app.route('/stock')
+def StockIndex():
+    tHeader = ['股票代碼', '每股成本', f'停利點({Creds.stopWin*100}%)', f'停損點({Creds.stopLose*100}%)', '剩餘股數', '目前獲利']
+    con = db(**Creds.dbStockCon)
+    contents = con.query(f"""select stockID,
+ abs(sum(total_amount)/sum(quantity)) as total_cost,
+ abs(sum(total_amount)/sum(quantity))*{1+Creds.stopWin} as stop_win, 
+ abs(sum(total_amount)/sum(quantity))*{1-Creds.stopLose} as stop_lose,
+ sum(quantity) as current_stock,
+ sum(total_amount) as current_profit
+from `stock`.`transaction` group by stockID;
+    """).fetchall()
+    con.discon()
+    return render_template('stockOrder.html', tHeader=tHeader, contents=contents)
+
+@app.route('/stock/order', methods=['POST'])
+def StockOrder():
+    # transaction(stockID: str, price: float, quantity: int, dir: str)
+    # i = request.form['id']
+    # name = request.form['name']
+    # submitAction = request.form['submit']
+    transaction(stockID=request.form['id'], price=float(request.form['price']), quantity=float(request.form['shares']), dir=request.form['submit'])
+    return redirect(url_for('StockIndex'))
+
 @app.route('/req')
 def ReqPage():
     return render_template('req.html')
@@ -108,5 +133,30 @@ def SendMail():
     sm.LogoutsmTP()
     return render_template( 'mail.html', send_result = sendCode)
 
+def transaction(stockID: str, price: float, quantity: int, dir: str):
+    # call API to transact
+    # the unit of quantity is shares
+    # dir is buy or sell
+    # if API success, record the transaction into `stock`.`transaction`
+    if dir == 'buy':
+        taxRatio = 0
+    elif dir == 'sell':
+        taxRatio = 0.003
+        quantity*=-1
+    else:
+        return 'Wrong values'
+
+    # count the cost
+    amount = price * quantity
+    fee = round(abs(amount*0.1425/100))
+    tax = round(abs(amount*taxRatio))
+    total_cost = amount+fee+tax if fee>20 else amount+20+tax
+    per_cost = abs(total_cost) / quantity
+    transTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    con = db(**Creds.dbStockCon)
+    con.insert(f"insert into transaction values('{transTime}', '{stockID}', {price},\
+{quantity}, {-amount}, {tax}, {fee}, {-total_cost}, {abs(per_cost)}, '{dir}');")
+    con.discon()
+    return
 if __name__ == '__main__':
     app.run('0.0.0.0',debug=True)

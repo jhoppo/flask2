@@ -17,6 +17,7 @@ class db:
             cursor.execute(sql)
             self.conn.commit()
         except:
+            self.conn.close()
             with open(f"logs/{datetime.datetime.now().strftime('%Y%m%d')}_error.log", "w") as logF:
                 logF.write("insert\t"+sql+"\n")
     def discon(self):
