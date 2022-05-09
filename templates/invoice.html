@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Latest Invoice</title>
+</head>
+<body>
+ <table>
+     <tr>
+         <td>特別獎(1000w)</td>
+         <td>{{ invoice1000w }}</td>
+         <td>特獎(200w)</td>
+         <td>{{ invoice200w }}</td>
+         <td>頭獎(20w)</td>
+         <td>
+             {% for i in invoice20w %}
+             {{ i }}</br>
+             {% endfor %}
+         </td>
+         <td>增開陸獎(200)</td>
+         <td>
+             {% for i in invoice200 %}
+             {{ i }}</br>
+             {% endfor %}
+         </td>
+     </tr>
+ </table>
+</body>
+</html>

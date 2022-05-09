@@ -1,12 +1,47 @@
 from flask import Flask, redirect, request, url_for, render_template
 import pymysql
-from db import db
+from db import db, jh
 import Creds
 from jhmail import JiehongEmail as je
 import datetime
 import json
+import psycopg2
 
 app = Flask(__name__)
+
+@app.route('/jh/stock/rawdata')
+def JHStockRawdata():
+    return render_template('stockRawdata.html')
+
+@app.route('/jh/stock/rawdata/query', methods=['POST'])
+def JHStockRawdataQuery():
+    if request.form['startDate'] == '':
+        startDate = (datetime.datetime.now() - datetime.timedelta(days=60)).strftime("%Y-%m-%d")
+    else:
+        startDate = request.form['startDate']
+    if request.form['endDate'] == '':
+        endDate = datetime.datetime.now().strftime("%Y-%m-%d")
+    else:
+        endDate = request.form['endDate']
+    tHeader = ['date', 'stockID', 'trade_volume', \
+               'transaction', 'trade_value', 'open', \
+               'high', 'low', 'close', 'dir', \
+               'change', 'k_bar_type']
+    con = jh(**Creds.jhStockCon)
+    contents = con.query(f"select * from stock_rawdatav3 where \
+    stock_id = '{request.form['id']}' and \
+    date >= '{startDate}' and \
+    date <= '{endDate}'").fetchall()
+    con.discon()
+    return render_template('stockRawdata.html', tHeader=tHeader, contents=contents)
+
+@app.route('/jh/stock/')
+def JHStockIndex():
+    con = jh(**Creds.jhStockCon)
+    cont = con.query("select * from test;").fetchall()
+    con.discon()
+    print(cont[0])
+    return "HI"
 
 @app.route('/stock')
 def StockIndex():

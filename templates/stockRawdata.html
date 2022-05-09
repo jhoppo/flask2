@@ -2,21 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Place Order</title>
+    <title>Raw Data</title>
     <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-<form method="post" action="/stock/order">
+<form method="post" action="/jh/stock/rawdata/query">
   <p>
       股票代碼: <input type="text" name="id" />
-      股數: <input type="text" name="shares" />
-      價格: <input type="text" name="price" />
-  <input type="submit" name="submit" value="buy" />
-  <input type="submit" name="submit" value="sell" />
+      超日: <input type="date" name="startDate" />
+      迄日: <input type="date" name="endDate" />
+  <input type="submit" name="submit" value="Search!" />
   </p>
 </form>
-<p>
-    <table class="table">
+<table class="table">
     <tr class="tableHeader">
     {% for i in tHeader %}
         <th class="tableCell"> {{ i }} </th>
@@ -30,7 +28,5 @@
     </tr>
     {% endfor %}
 </table>
-</p>
-
 </body>
 </html>
