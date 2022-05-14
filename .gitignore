@@ -9,3 +9,15 @@ Cred*
 test*
 startup.sh
 update.sh
+analyze.py
+
+*
+!app.py
+!db.py
+!funcs.py
+!jhmail.py
+!required.txt
+!logs/
+!templates/
+!static/
+!data/

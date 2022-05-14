@@ -87,3 +87,49 @@ def invoice():
         fn = SelectionSort(ls=ls,nums=seq)[-1]
         return fn
 
+class StockAna:
+    def __init__(self, execDate, n, stockID):
+        self.execDate=execDate
+        self.n=n
+        self.stockID=stockID
+    def mean_transaction(self):
+        from db import jh
+        import Creds
+        sql = f"select sum(foo.trade_volume)/{self.n} as mean_transaction from \
+        (select trade_volume from stock_rawdatav3 where \
+        stock_id = '{self.stockID}' and \
+        date<'{self.execDate}' order by date desc \
+        limit {self.n} ) as foo;"
+        con = jh(**Creds.jhStockCon)
+        rawtable = con.query(sql).fetchall()
+        con.discon()
+        return rawtable
+
+    def RSI(self):
+        from db import jh
+        import Creds
+        sql = f"select date, closing_price from stock_rawdatav3 where \
+        date < '{self.execDate}' and \
+        stock_id = '{self.stockID}' \
+        order by date desc  limit {self.n} ;"
+        con = jh(**Creds.jhStockCon)
+        rawtable = con.query(sql).fetchall()
+        con.discon()
+        if len(rawtable) == n:
+            dict = { i:j for i,j in rawtable}
+            values = [i for i in dict.values()]
+            pos = 0
+            neg = 0
+            for i in range(len(values)-1,0,-1):
+                diff = values[i] - values[i-1]
+                if diff > 0:
+                    pos+=diff
+                else:
+                    neg+=abs(diff)
+            A = pos/(self.n-1)
+            B = neg/(self.n-1)
+            rsi = A / (A+B) * 100
+            dict = {stockID:rsi}
+            return dict
+        else:
+            return {stockID:-1}
